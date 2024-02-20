@@ -2,65 +2,104 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdminLoginRequest;
 use App\Http\Requests\StoreAdminRequest;
-use App\Http\Requests\UpdateAdminRequest;
 use App\Models\Admin;
+use GuzzleHttp\Psr7\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+
+    public function login(AdminLoginRequest $request)
     {
-        //
+
+        //validate the form
+        //check if credential exists
+        //if it does, return token and user info
+        //if it dosent, send and unauthrized error
+
+
+        $credentials = $request->only(['email','password']);
+
+        if(!Auth::guard('admin')->attempt($credentials))
+        {
+            return response()->json([
+                'message' => 'Unauthorized'
+            ],401);
+        }
+    
+        $user = Admin::whereEmail($request->email)->first();
+        $token = $user->createToken('Personal Access Token')->plainTextToken;
+    
+        return response()->json([
+            'accessToken' =>$token,
+            'user' => $user
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function register(StoreAdminRequest $request)
     {
-        //
+        //Validate form
+        //store in the admin table
+        //return success message and the stored data
+
+       $admin = Admin::create([
+        'name' => $request->name,
+        'email' => $request->email,
+        'password' => Hash::make($request->password)
+       ]);
+
+       return response()->json([
+        'status' => true,
+        'message' => 'Record saved successfully!',
+        'data' => $admin
+       ]);
+
+
+       Admin::all();
+       Admin::latest ()->paginate(10);
+
+       Admin::where('email', $request->email)->first();
+
+       Admin::whereId($request->id)->delete();
+
+
+
+
+       $admin = Admin::where('id', $request->id)->first();
+       Admin::whereId($request->id)->update([
+        'name' => $request->name ?? $admin->name,
+        'email' => $request->email ?? $admin->email,
+        'password' => Hash::make($request->password) ?? $admin->password
+       ]);
+
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreAdminRequest $request)
+    
+
+
+
+
+    public function logout(Request $request)
     {
-        //
+
+        $request->user()->tokens()->delete();
+
+        return response()->json([
+        'message' => 'Successfully logged out'
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Admin $admin)
+    public function user(Request $request)
     {
-        //
+        return response()->json($request->user());
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Admin $admin)
-    {
-        //
-    }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateAdminRequest $request, Admin $admin)
-    {
-        //
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Admin $admin)
-    {
-        //
-    }
+
+
 }
