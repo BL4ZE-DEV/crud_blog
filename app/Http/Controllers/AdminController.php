@@ -82,21 +82,22 @@ class AdminController extends Controller
 
 
 
-    public function logout(Request $request)
-    {
+    // public function logout(Request $request)
+    // {
 
-        $request->user()->tokens()->delete();
+    //     auth()->guard('admin')->user()->tokens()->delete();
+    //     // $request->user()->tokens()->delete();
 
-        return response()->json([
-        'message' => 'Successfully logged out'
-        ]);
-    }
+    //     return response()->json([
+    //     'message' => 'Successfully logged out'
+    //     ]);
+    // }
 
-    public function user(Request $request)
-    {
-        return response()->json($request->user());
+    // public function user(Request $request)
+    // {
+    //     return response()->json($request->user());
 
-    }
+    // }
 
 
 

@@ -28,12 +28,14 @@ Route::post('admin-register', [AdminController::class, 'register']);
 
 
 
-Route::prefix('category')->middleware(['auth:sanctum', 'auth:admin'])->group( function(){
+Route::prefix('categories')->middleware('auth:sanctum')->group( function(){
 
     Route::post('create', [CategoryController::class, 'store']);
     Route::get('fetch', [CategoryController::class, 'index']);
-    Route::put('update', [CategoryController::class, 'update']);
-    Route::delete('delete', [CategoryController::class, 'destroy']);
+
+    Route::get('view/{category}', [CategoryController::class, 'show']);
+    Route::put('update/{category}', [CategoryController::class, 'update']);
+    Route::delete('delete/{category}', [CategoryController::class, 'destroy']);
 });
 
 
