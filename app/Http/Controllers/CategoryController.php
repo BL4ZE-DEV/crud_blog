@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
+use Exception;
 
 class CategoryController extends Controller
 {
@@ -13,23 +14,34 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        // $categories = Category::all();
+        $categories = Category::latest()->paginate(10);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Categories fetched successfully!',
+            'data' => $categories
+        ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreCategoryRequest $request)
     {
-        //
+
+        $category = Category::create([
+            'name' => $request->name,
+            'description' => $request->description
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Category created successfully!',
+            'data' => $category
+        ]);
+
     }
 
     /**
@@ -37,15 +49,20 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
-    }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Category $category)
-    {
-        //
+        // $category = Category::whereId($id)->first();
+        try{
+            return response()->json([
+                'status' => true,
+                'message' => 'Category created successfully!',
+                'data' => $category
+            ]);
+        } catch(\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Something went wrong'. $e->getMessage()
+            ]);
+        }
     }
 
     /**
@@ -53,7 +70,18 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        //
+        // Category::whereId($id)->update([]);
+        // ?: ?? 
+
+        $category->update([
+            'name' => $request->name ?? $category->name,
+            'description' => $request->description ?? $category->description,
+        ]);
+
+        return response()->json([
+            'status' => true,
+            'message' => 'Category has been updated successfully!'
+        ]);
     }
 
     /**
@@ -61,6 +89,11 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
+        if($category->delete()){
+            return response()->json([
+                'status' => true,
+                'message' => 'Category has been deleted successfully!'
+            ]);
+        }
     }
 }

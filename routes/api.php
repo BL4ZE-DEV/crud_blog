@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CategoryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,6 +19,26 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+
+Route::post('admin-login', [AdminController::class, 'login']);
+Route::post('admin-register', [AdminController::class, 'register']);
+
+
+
+
+
+Route::prefix('categories')->middleware('auth:sanctum')->group( function(){
+
+    Route::post('create', [CategoryController::class, 'store']);
+    Route::get('fetch', [CategoryController::class, 'index']);
+
+    Route::get('view/{category}', [CategoryController::class, 'show']);
+    Route::put('update/{category}', [CategoryController::class, 'update']);
+    Route::delete('delete/{category}', [CategoryController::class, 'destroy']);
+});
+
+
 
 //User:
 //Register
